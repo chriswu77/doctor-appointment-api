@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize')
 
 const dbName = 'calendar'
-const username = 'postgres'
+const username = 'chriswu'
 const password = ''
 
 const sequelize = new Sequelize(dbName, username, password, {
