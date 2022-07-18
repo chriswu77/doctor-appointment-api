@@ -1,6 +1,5 @@
 const Doctor = require('../models/doctor')
 const Appointment = require('../models/appointment')
-const { getDateWithoutTime } = require('../util')
 
 exports.index = async (req, res, next) => {
     try {
@@ -39,11 +38,9 @@ exports.getAppointments = async (req, res, next) => {
         let appointments
 
         if (date) {
-            const convertedDate = new Date(date)
-
             appointments = await doctor.getAppointments({
                 where: {
-                    dateOnly: getDateWithoutTime(convertedDate),
+                    date: new Date(date),
                 },
             })
         } else {
@@ -77,9 +74,9 @@ exports.createAppointment = async (req, res, next) => {
     const { firstName, lastName, date } = req.body
 
     try {
-        const convertedDate = new Date(date)
+        const toDate = new Date(date)
 
-        const minutes = convertedDate.getMinutes()
+        const minutes = toDate.getMinutes()
         const options = [0, 15, 30, 45]
 
         if (!options.includes(minutes)) {
@@ -90,7 +87,8 @@ exports.createAppointment = async (req, res, next) => {
 
         const sameAppointmentsCount = await doctor.countAppointments({
             where: {
-                dateTime: convertedDate,
+                date: toDate,
+                time: toDate,
             },
         })
 
@@ -109,10 +107,10 @@ exports.createAppointment = async (req, res, next) => {
             where: {
                 firstName: firstName,
                 lastName: lastName,
-                dateTime: convertedDate,
+                date: toDate,
+                time: toDate,
             },
             defaults: {
-                dateOnly: getDateWithoutTime(convertedDate),
                 kind: patientAppointmentsCount > 0 ? 'followUp' : 'new',
                 doctorId: doctorId,
             },
