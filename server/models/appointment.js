@@ -3,6 +3,12 @@ const Doctor = require('./doctor')
 const sequelize = require('../../db')
 
 const Appointment = sequelize.define('appointment', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+        allowNull: false,
+    },
     firstName: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -25,7 +31,7 @@ const Appointment = sequelize.define('appointment', {
         defaultValue: 'new',
     },
     doctorId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         references: {
             model: Doctor,
             key: 'id',
