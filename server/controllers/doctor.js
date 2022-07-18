@@ -18,7 +18,7 @@ exports.create = async (req, res, next) => {
     try {
         const doctor = await Doctor.create({
             firstName: firstName,
-            lastName: lastName
+            lastName: lastName,
         })
 
         res.status(201).json(doctor)
@@ -88,21 +88,20 @@ exports.createAppointment = async (req, res, next) => {
 
         const doctor = await Doctor.findByPk(doctorId)
 
-        const appointments = await doctor.getAppointments({
+        const sameAppointmentsCount = await doctor.countAppointments({
             where: {
                 dateTime: convertedDate,
             },
         })
 
-        if (appointments.length >= 3) {
+        if (sameAppointmentsCount >= 3) {
             throw new Error('No availability at current time')
         }
 
-        const patientAppointments = await Appointment.findAll({
+        const patientAppointmentsCount = await doctor.countAppointments({
             where: {
                 firstName: firstName,
                 lastName: lastName,
-                doctorId: doctorId,
             },
         })
 
@@ -114,7 +113,7 @@ exports.createAppointment = async (req, res, next) => {
             },
             defaults: {
                 dateOnly: getDateWithoutTime(convertedDate),
-                kind: patientAppointments.length > 0 ? 'followUp' : 'new',
+                kind: patientAppointmentsCount > 0 ? 'followUp' : 'new',
                 doctorId: doctorId,
             },
         })
