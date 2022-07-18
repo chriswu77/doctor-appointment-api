@@ -5,7 +5,7 @@ doctorRouter.get('/', doctorController.index)
 
 doctorRouter.post('/', doctorController.create)
 
-doctorRouter.get('/:doctorId/appointments', doctorController.getAllAppointments)
+doctorRouter.get('/:doctorId/appointments', doctorController.getAppointments)
 
 doctorRouter.delete(
     '/:doctorId/appointments/:appointmentId',

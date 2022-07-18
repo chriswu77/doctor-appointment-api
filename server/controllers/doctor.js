@@ -2,16 +2,16 @@ const Doctor = require('../models/doctor')
 const Appointment = require('../models/appointment')
 const { getDateWithoutTime } = require('../util')
 
-exports.index = async (req, res) => {
+exports.index = async (req, res, next) => {
     try {
         const doctors = await Doctor.findAll()
         res.status(200).json(doctors)
     } catch (err) {
-        res.sendStatus(500)
+        next(err)
     }
 }
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
     const { firstName, lastName } = req.body
 
     try {
@@ -28,48 +28,54 @@ exports.create = async (req, res) => {
 
         res.status(201).json(doctor)
     } catch (err) {
-        res.status(500).send(err)
+        next(err)
     }
 }
 
-exports.getAllAppointments = async (req, res) => {
+exports.getAppointments = async (req, res, next) => {
     const { doctorId } = req.params
 
     // query param should be date converted to ISO string
     const { date } = req.query
 
     try {
-        const convertedDate = new Date(date)
+        const doctor = await Doctor.findByPk(doctorId)
 
-        const doctor = await Doctor.findByPk(parseInt(doctorId))
+        let appointments
 
-        const appointments = await doctor.getAppointments({
-            where: {
-                dateOnly: getDateWithoutTime(convertedDate),
-            },
-        })
+        if (date) {
+            const convertedDate = new Date(date)
+
+            appointments = await doctor.getAppointments({
+                where: {
+                    dateOnly: getDateWithoutTime(convertedDate),
+                },
+            })
+        } else {
+            appointments = await doctor.getAppointments()
+        }
 
         res.status(200).json(appointments)
     } catch (err) {
-        res.status(500).send(err)
+        next(err)
     }
 }
 
-exports.deleteAppointment = async (req, res) => {
+exports.deleteAppointment = async (req, res, next) => {
     const { doctorId, appointmentId } = req.params
 
     try {
-        const doctor = await Doctor.findByPk(parseInt(doctorId))
+        const doctor = await Doctor.findByPk(doctorId)
 
-        await doctor.removeAppointment(parseInt(appointmentId))
+        await doctor.removeAppointment(appointmentId)
 
         res.sendStatus(204)
     } catch (err) {
-        res.status(500).send(err)
+        next(err)
     }
 }
 
-exports.createAppointment = async (req, res) => {
+exports.createAppointment = async (req, res, next) => {
     const { doctorId } = req.params
 
     // date should be ISO string
@@ -78,8 +84,6 @@ exports.createAppointment = async (req, res) => {
     try {
         const convertedDate = new Date(date)
 
-        console.log('convertedDate', convertedDate)
-
         const minutes = convertedDate.getMinutes()
         const options = [0, 15, 30, 45]
 
@@ -87,7 +91,7 @@ exports.createAppointment = async (req, res) => {
             throw new Error('Appointment time is not valid')
         }
 
-        const doctor = await Doctor.findByPk(parseInt(doctorId))
+        const doctor = await Doctor.findByPk(doctorId)
 
         const appointments = await doctor.getAppointments({
             where: {
@@ -103,7 +107,7 @@ exports.createAppointment = async (req, res) => {
             where: {
                 firstName: firstName,
                 lastName: lastName,
-                doctorId: parseInt(doctorId),
+                doctorId: doctorId,
             },
         })
 
@@ -116,7 +120,7 @@ exports.createAppointment = async (req, res) => {
             defaults: {
                 dateOnly: getDateWithoutTime(convertedDate),
                 kind: patientAppointments.length > 0 ? 'followUp' : 'new',
-                doctorId: parseInt(doctorId),
+                doctorId: doctorId,
             },
         })
 
@@ -126,6 +130,6 @@ exports.createAppointment = async (req, res) => {
 
         res.status(201).json(newAppointment)
     } catch (err) {
-        res.status(500).send(err)
+        next(err)
     }
 }
