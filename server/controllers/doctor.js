@@ -5,6 +5,7 @@ const { getDateWithoutTime } = require('../util')
 exports.index = async (req, res, next) => {
     try {
         const doctors = await Doctor.findAll()
+
         res.status(200).json(doctors)
     } catch (err) {
         next(err)
@@ -15,16 +16,10 @@ exports.create = async (req, res, next) => {
     const { firstName, lastName } = req.body
 
     try {
-        const [doctor, created] = await Doctor.findOrCreate({
-            where: {
-                firstName: firstName,
-                lastName: lastName,
-            },
+        const doctor = await Doctor.create({
+            firstName: firstName,
+            lastName: lastName
         })
-
-        if (!created) {
-            throw new Error('Doctor already exists')
-        }
 
         res.status(201).json(doctor)
     } catch (err) {
