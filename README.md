@@ -10,12 +10,12 @@
 GET - all doctors - `/api/doctors`
 
 POST - create a doctor - `/api/doctors`
-body accepts `firstName` and `lastName`
+body: `firstName`, `lastName`
 
-GET - all appointments for a doctor - `/api/doctors/:doctorId/appointments?date={ISOString date}`
-note: query param accepts date converted to ISO string
+GET - all appointments for a doctor - `/api/doctors/:doctorId/appointments`
+optional query param: `date` (ISOString date) to GET all appointments for a doctor on a particular day
 
 DELETE - appointment - `/api/doctors/:doctorId/appointments/:appointmentId`
 
 POST - create an appointment - `/api/doctors/:doctorId/appointments`
-body accepts `firstName` and `lastName` of patient, as well as the appointment time `date` (date should be ISO string)
+body: `firstName` of patient, `lastName` of patient, `date` (ISOString date)
