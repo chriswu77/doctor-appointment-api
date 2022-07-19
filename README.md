@@ -1,4 +1,4 @@
-## Notable Takehome
+## Doctor Calendar API
 
 ## Directions
 
@@ -9,13 +9,13 @@
 
 GET - all doctors - `/api/doctors`
 
-POST - create a doctor - `/api/doctors`
+POST - create a doctor - `/api/doctors`<br/>
 body: `firstName`, `lastName`
 
-GET - all appointments for a doctor - `/api/doctors/:doctorId/appointments`
+GET - all appointments for a doctor - `/api/doctors/:doctorId/appointments`<br/>
 optional query param: `date` (ISOString date) to GET all appointments for a doctor on a particular day
 
 DELETE - appointment - `/api/doctors/:doctorId/appointments/:appointmentId`
 
-POST - create an appointment - `/api/doctors/:doctorId/appointments`
+POST - create an appointment - `/api/doctors/:doctorId/appointments`<br/>
 body: `firstName` of patient, `lastName` of patient, `date` (ISOString date)
